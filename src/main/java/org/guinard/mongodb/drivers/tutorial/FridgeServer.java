@@ -4,11 +4,14 @@
  */
 package org.guinard.mongodb.drivers.tutorial;
 
-import mongoNative.DatasourceProviderMongoNative;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import jongo.DatasourceProviderJongo;
-import mongoNative.Fridge;
+//import mongoNative.Fridge;
+//import mongoNative.Product;
+import mongojack.DatasourceProviderMongoJack;
+import mongojack.Fridge;
+import mongojack.Product;
 import static spark.Spark.*;
 import spark.*;
 
@@ -18,9 +21,15 @@ import spark.*;
  */
 public class FridgeServer {
 
+    // Mongo Native:
     //private static DatasourceProviderMongoNative provider = new DatasourceProviderMongoNative();
-    private static DatasourceProviderJongo provider = new DatasourceProviderJongo();
+    
+    // Jongo:
+    //private static AbstractDatasourceProvider provider = new DatasourceProviderJongo();
 
+    // MongoJack:
+    private static AbstractDatasourceProvider provider = new DatasourceProviderMongoJack();
+    
     /**
      * @param args the command line arguments
      */
@@ -41,7 +50,8 @@ public class FridgeServer {
 	get(new JsonGsonTransformerRoute("/fridges") {
 	    @Override
 	    public Object handle(Request request, Response response) {
-		return provider.loadResources("Fridges");
+		return provider.loadResources("Fridges", Fridge.class);
+		//return provider.loadResources("Fridges");
 	    }
 	});
 
@@ -100,14 +110,16 @@ public class FridgeServer {
 	get(new JsonGsonTransformerRoute("/products") {
 	    @Override
 	    public Object handle(Request request, Response response) {
-		return provider.loadResources("Products");
+		//return provider.loadResources("Products");
+		return provider.loadResources("Products", Product.class);
 	    }
 	});
 
 	get(new JsonGsonTransformerRoute("/products/:name") {
 	    @Override
 	    public Object handle(Request request, Response response) {
-		return provider.loadResource(request.params(":name"), "Products");
+		//return provider.loadResource(request.params(":name"), "Products");
+		return provider.loadResource(request.params(":name"), "Products", Product.class);
 	    }
 	});
 

@@ -79,8 +79,9 @@ public class DatasourceProviderMongoNative {
 	    throw new InvalidJsonException();
 	}
 
-	DBCollection collec = db.getCollection("Fridges");
+	//Shell query:
 	//db.Fridges.update({...}, {"$push" : {"putOrRemoveLog" : {...}}});
+	DBCollection collec = db.getCollection("Fridges");
 	BasicDBObject log = new BasicDBObject(Fridge.PRODLOGKEY, putOrRemoveLog);
 	BasicDBObject push = new BasicDBObject("$push", log);
 	collec.update(queryByName(fridgeName), push);
@@ -88,6 +89,7 @@ public class DatasourceProviderMongoNative {
 
     public DBObject loadResource(String name, String collection) {
 	DBCollection collec = db.getCollection(collection);
+
 	// We query "by example"
 	BasicDBObject query = new BasicDBObject("name", name);
 	DBObject resource = collec.findOne(query);
@@ -101,9 +103,10 @@ public class DatasourceProviderMongoNative {
 	List results = new ArrayList();
 	DBCollection collec = db.getCollection(collection);
 	DBCursor cursor = collec.find();
+
 	try {
-	    while (cursor.hasNext()) {
-		results.add(cursor.next());
+	    for (DBObject current : cursor) {
+		results.add(current);
 	    }
 	} finally {
 	    cursor.close();
