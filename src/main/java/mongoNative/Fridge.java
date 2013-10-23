@@ -5,8 +5,6 @@
 package mongoNative;
 
 import com.mongodb.BasicDBObject;
-import com.mongodb.DBObject;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 /**
@@ -15,6 +13,8 @@ import java.util.ArrayList;
  */
 public class Fridge extends BasicDBObject {
 
+    // key value maps
+    
     public static String NAMEKEY = "name";
     public static String PRODLOGKEY = "putOrRemoveLog";
     public static String DESCRIPTIONKEY = "description";

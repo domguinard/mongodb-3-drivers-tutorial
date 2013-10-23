@@ -15,6 +15,8 @@ public interface AbstractDatasourceProvider {
     void createFridge(String json) throws InvalidJsonException;
 
     void createProduct(String json) throws InvalidJsonException;
+    
+    List getProductsFromFridge(String fridgeName);
 
     <T> T loadResource(String name, String collection, Class<T> cl);
 

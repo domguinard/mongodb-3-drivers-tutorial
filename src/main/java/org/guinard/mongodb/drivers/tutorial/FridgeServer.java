@@ -23,13 +23,11 @@ public class FridgeServer {
 
     // Mongo Native:
     //private static DatasourceProviderMongoNative provider = new DatasourceProviderMongoNative();
-    
     // Jongo:
-    //private static AbstractDatasourceProvider provider = new DatasourceProviderJongo();
-
+    private static AbstractDatasourceProvider provider = new DatasourceProviderJongo();
     // MongoJack:
-    private static AbstractDatasourceProvider provider = new DatasourceProviderMongoJack();
-    
+    //private static AbstractDatasourceProvider provider = new DatasourceProviderMongoJack();
+
     /**
      * @param args the command line arguments
      */
@@ -47,7 +45,7 @@ public class FridgeServer {
 	    }
 	});
 
-	get(new JsonGsonTransformerRoute("/fridges") {
+	get(new JsonJacksonTransformerRoute("/fridges") {
 	    @Override
 	    public Object handle(Request request, Response response) {
 		return provider.loadResources("Fridges", Fridge.class);
@@ -55,46 +53,36 @@ public class FridgeServer {
 	    }
 	});
 
-	put(new Route("/fridges/:name/products", "application/json") {
+	get(new JsonJacksonTransformerRoute("/fridges/:name") {
 	    @Override
 	    public Object handle(Request request, Response response) {
-		try {
-		    provider.putOrRemoveProductFromFridge(request.params(":name"), request.body());
-		    return reply(response, "Updated", 200);
-		} catch (InvalidJsonException ex) {
-		    Logger.getLogger(FridgeServer.class.getName()).log(Level.SEVERE, null, ex);
-		}
-		return reply(response, "An error occured! Check your JSON!", 400);
+		return provider.loadResource(request.params(":name"), "Fridges", Fridge.class);
+		//return provider.loadResources("Fridges");
 	    }
 	});
-	
-	put(new JsonGsonTransformerRoute("/fridges/:name/products") {
-	    @Override
-	    public Object handle(Request request, Response response) {
-		try {
-		    provider.putOrRemoveProductFromFridge(request.params(":name"), request.body());
-		    return reply(response, "Updated", 200);
-		} catch (InvalidJsonException ex) {
-		    Logger.getLogger(FridgeServer.class.getName()).log(Level.SEVERE, null, ex);
-		}
-		return reply(response, "An error occured! Check your JSON!", 400);
-	    }
-	});
-	
-//	get(new JsonGsonTransformerRoute("/fridges/:name/products") {
-//	    @Override
-//	    public Object handle(Request request, Response response) {
-//		try {
-//		    //TODO!
-//		    return reply(response, "Updated", 200);
-//		} catch (InvalidJsonException ex) {
-//		    Logger.getLogger(FridgeServer.class.getName()).log(Level.SEVERE, null, ex);
-//		}
-//		return reply(response, "An error occured! Check your JSON!", 400);
-//	    }
-//	});
 
-	post(new JsonGsonTransformerRoute("/products") {
+	put(new JsonJacksonTransformerRoute("/fridges/:name/products") {
+	    @Override
+	    public Object handle(Request request, Response response) {
+		try {
+		    provider.putOrRemoveProductFromFridge(request.params(":name"), request.body());
+		    return reply(response, "Updated", 200);
+		} catch (InvalidJsonException ex) {
+		    Logger.getLogger(FridgeServer.class.getName()).log(Level.SEVERE, null, ex);
+		}
+		return reply(response, "An error occured! Check your JSON!", 400);
+	    }
+	});
+
+	get(new JsonJacksonTransformerRoute("/fridges/:name/products") {
+	    @Override
+	    public Object handle(Request request, Response response) {
+		return provider.getProductsFromFridge(request.params(":name"));
+	    }
+
+	});
+
+	post(new JsonJacksonTransformerRoute("/products") {
 	    @Override
 	    public Object handle(Request request, Response response) {
 		try {
@@ -107,7 +95,7 @@ public class FridgeServer {
 	    }
 	});
 
-	get(new JsonGsonTransformerRoute("/products") {
+	get(new JsonJacksonTransformerRoute("/products") {
 	    @Override
 	    public Object handle(Request request, Response response) {
 		//return provider.loadResources("Products");
@@ -115,7 +103,7 @@ public class FridgeServer {
 	    }
 	});
 
-	get(new JsonGsonTransformerRoute("/products/:name") {
+	get(new JsonJacksonTransformerRoute("/products/:name") {
 	    @Override
 	    public Object handle(Request request, Response response) {
 		//return provider.loadResource(request.params(":name"), "Products");

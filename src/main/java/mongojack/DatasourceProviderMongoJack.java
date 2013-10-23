@@ -44,7 +44,7 @@ public class DatasourceProviderMongoJack implements AbstractDatasourceProvider {
 
     private DB getDb() throws UnknownHostException {
 	MongoClient mongoClient = new MongoClient();
-	DB db = mongoClient.getDB("fridges");
+	DB db = mongoClient.getDB("fridgeDb");
 	return db;
     }
 
@@ -70,7 +70,7 @@ public class DatasourceProviderMongoJack implements AbstractDatasourceProvider {
 	DBCollection collec = db.getCollection("Fridges");
 	JacksonDBCollection<Fridge, String> collecMj = JacksonDBCollection.wrap(collec,
 		Fridge.class, String.class);
-	collecMj.save(newRes);
+	collecMj.insert(newRes);
     }
 
     @Override
@@ -86,7 +86,7 @@ public class DatasourceProviderMongoJack implements AbstractDatasourceProvider {
 	DBCollection collec = db.getCollection("Products");
 	JacksonDBCollection<Product, String> collecMj = JacksonDBCollection.wrap(collec,
 		Product.class, String.class);
-	collecMj.save(newRes);
+	collecMj.insert(newRes);
     }
 
     @Override
@@ -104,15 +104,13 @@ public class DatasourceProviderMongoJack implements AbstractDatasourceProvider {
 	DBCollection collec = db.getCollection("Fridges");
 	JacksonDBCollection<Product, String> collecMj = JacksonDBCollection.wrap(collec,
 		Product.class, String.class);
-
-	//Shell query:
-	//db.Fridges.update({...}, {"$push" : {"putOrRemoveLog" : {...}}});
 	collecMj.update(DBQuery.is("name", fridgeName), DBUpdate.push("putOrRemoveLog", newRes));
     }
 
     @Override
     public <T> T loadResource(String name, String collection, Class<T> cl) {
 	// We query "by example"
+	// Shell query: db.xxx.find({"name": name});
 	DBCollection collec = db.getCollection("Fridges");
 	JacksonDBCollection<T, String> collecMj = JacksonDBCollection.wrap(collec,
 		cl, String.class);
@@ -122,6 +120,7 @@ public class DatasourceProviderMongoJack implements AbstractDatasourceProvider {
 
     @Override
     public <T> List<T> loadResources(String collection, Class<T> cl) {
+	// Shell query: db.xxx.find();
 	List<T> results = new ArrayList<T>();
 	DBCollection collec = db.getCollection("Fridges");
 	try {
@@ -136,6 +135,10 @@ public class DatasourceProviderMongoJack implements AbstractDatasourceProvider {
 	    System.out.println(ex);
 	}
 	return results;
+    }
+
+    public List getProductsFromFridge(String fridgeName) {
+	throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     private BasicDBObject queryByName(String name) {

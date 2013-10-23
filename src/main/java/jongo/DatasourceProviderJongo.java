@@ -43,7 +43,7 @@ public class DatasourceProviderJongo implements AbstractDatasourceProvider {
 
     private DB getDb() throws UnknownHostException {
 	MongoClient mongoClient = new MongoClient();
-	DB db = mongoClient.getDB("fridges");
+	DB db = mongoClient.getDB("fridgeDb");
 	return db;
     }
 
@@ -65,7 +65,7 @@ public class DatasourceProviderJongo implements AbstractDatasourceProvider {
 	    throw new InvalidJsonException();
 	}
 	MongoCollection fridges = db.getCollection("Fridges");
-	fridges.save(newRes);
+	fridges.insert(newRes);
     }
 
     public void createProduct(String json) throws InvalidJsonException {
@@ -76,9 +76,9 @@ public class DatasourceProviderJongo implements AbstractDatasourceProvider {
 	if (newRes.getName() == null) {
 	    throw new InvalidJsonException();
 	}
-	
+
 	MongoCollection fridges = db.getCollection("Fridges");
-	fridges.save(newRes);
+	fridges.insert(newRes);
     }
 
     public void putOrRemoveProductFromFridge(String fridgeName, String json) throws InvalidJsonException {
@@ -98,19 +98,25 @@ public class DatasourceProviderJongo implements AbstractDatasourceProvider {
 
     public <T> T loadResource(String name, String collection, Class<T> cl) {
 	// We query "by example"
+	// Shell query: db.xxx.find({"name": name});
 	MongoCollection collec = db.getCollection(collection);
 	return collec.findOne("{name: #}", name).as(cl);
     }
-    
 
     public <T> List<T> loadResources(String collection, Class<T> cl) {
+	// Shell query: db.xxx.find();
 	List<T> results = new ArrayList<T>();
 	MongoCollection collec = db.getCollection(collection);
 	Iterable<T> all = collec.find().as(cl);
-	for(T current: all) {
+	for (T current : all) {
 	    results.add(current);
 	}
 	return results;
+    }
+
+    public List getProductsFromFridge(String fridgeName) {
+	MongoCollection fridges = db.getCollection("Fridges");
+	return fridges.findOne("{name: #}", fridgeName).projection("{putOrRemoveLog: 1}").as(List.class);
     }
 
     private BasicDBObject queryByName(String name) {

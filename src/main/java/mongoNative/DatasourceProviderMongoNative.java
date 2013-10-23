@@ -36,7 +36,7 @@ public class DatasourceProviderMongoNative {
 
     private DB getDb() throws UnknownHostException {
 	MongoClient mongoClient = new MongoClient();
-	DB db = mongoClient.getDB("fridges");
+	DB db = mongoClient.getDB("fridgeDb");
 	return db;
     }
 
@@ -58,7 +58,7 @@ public class DatasourceProviderMongoNative {
 	    throw new InvalidJsonException();
 	};
 
-	collec.save(dbOjbFromJson(json));
+	collec.insert(dbOjbFromJson(json));
     }
 
     public void createProduct(String json) throws InvalidJsonException {
@@ -91,6 +91,7 @@ public class DatasourceProviderMongoNative {
 	DBCollection collec = db.getCollection(collection);
 
 	// We query "by example"
+	// Shell query: db.xxx.find({"name": name});
 	BasicDBObject query = new BasicDBObject("name", name);
 	DBObject resource = collec.findOne(query);
 
@@ -100,6 +101,7 @@ public class DatasourceProviderMongoNative {
     }
 
     public List loadResources(String collection) {
+	// Shell query: db.xxx.find();
 	List results = new ArrayList();
 	DBCollection collec = db.getCollection(collection);
 	DBCursor cursor = collec.find();

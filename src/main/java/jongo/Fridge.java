@@ -9,7 +9,7 @@ import java.util.List;
 
 /**
  *
- * @author misterdom
+ * @author domguinard
  */
 public class Fridge {
     private String name;
